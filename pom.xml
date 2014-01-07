@@ -44,12 +44,15 @@
     <developers>
         <developer>
             <name>Paco Saucedo</name>
-            <email>fcosfc AT hotmail.com</email>
-            <roles>
-                <role>commiter</role>
-            </roles>
+            <url>http://fcosfc.wordpress.com</url>
         </developer>
     </developers>
+    
+    <scm>
+        <connection>scm:git:https://github.com/fcosfc/HornetQRESTInterfaceClientLib.git</connection>
+        <developerConnection>scm:git:https://github.com/fcosfc/HornetQRESTInterfaceClientLib.git</developerConnection>
+        <url>https://github.com/fcosfc/HornetQRESTInterfaceClientLib.git</url>
+    </scm>
 
     <build>
         <plugins>
