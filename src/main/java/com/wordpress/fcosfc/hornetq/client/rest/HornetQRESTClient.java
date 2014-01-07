@@ -41,8 +41,8 @@ public class HornetQRESTClient implements MessagingInterface {
      * Default constructor
      */
     protected HornetQRESTClient() {
-        this.isStarted = false;
-        this.initLinks();        
+        isStarted = false;
+        initLinks();        
     }
     
     /**
@@ -63,10 +63,10 @@ public class HornetQRESTClient implements MessagingInterface {
         this.queue = queue;
         this.user = user;
         this.password = password;
-        this.msgSubscriberId = messagesSubscriberId;
+        msgSubscriberId = messagesSubscriberId;
 
-        this.isStarted = false;
-        this.initLinks();
+        isStarted = false;
+        initLinks();
     }
     
     /**
@@ -75,7 +75,7 @@ public class HornetQRESTClient implements MessagingInterface {
      * @return the value of serverURL
      */
     public String getServerURL() {
-        return this.serverURL;
+        return serverURL;
     }
     
     /**
@@ -84,10 +84,10 @@ public class HornetQRESTClient implements MessagingInterface {
      * @param serverURL new value of serverURL
      */
     public void setServerURL(String serverURL) throws IllegalStateException {
-        if (this.isStarted) {
+        if (isStarted) {
             throw new IllegalStateException("The client is started, you must stop it before changing the property");
         }
-        this.serverURL = serverURL;
+        serverURL = serverURL;
     }
     
     /**
@@ -96,19 +96,19 @@ public class HornetQRESTClient implements MessagingInterface {
      * @return the value of queue
      */
     public String getQueue() {
-        return this.queue;
+        return queue;
     }
     
     /**
      * Set the value of queue
      *
-     * @param serverURL new value of queue
+     * @param queue new value of queue
      */
     public void setQueue(String queue) throws IllegalStateException {
-        if (this.isStarted) {
+        if (isStarted) {
             throw new IllegalStateException("The client is started, you must stop it before changing the property");
         }
-        this.queue = queue;
+        queue = queue;
     }
     
     /**
@@ -117,19 +117,19 @@ public class HornetQRESTClient implements MessagingInterface {
      * @return the value of user
      */
     public String getUser() {
-        return this.user;
+        return user;
     }
     
     /**
      * Set the value of user
      *
-     * @param serverURL new value of user
+     * @param user new value of user
      */
     public void setUser(String user) throws IllegalStateException {
-        if (this.isStarted) {
+        if (isStarted) {
             throw new IllegalStateException("The client is started, you must stop it before changing the property");
         }
-        this.user = user;
+        user = user;
     }
     
     /**
@@ -138,19 +138,19 @@ public class HornetQRESTClient implements MessagingInterface {
      * @return the value of password
      */
     public String getPassword() {
-        return this.password;
+        return password;
     }
     
     /**
      * Set the value of password
      *
-     * @param serverURL new value of password
+     * @param password new value of password
      */
     public void setPassword(String password) throws IllegalStateException {
-        if (this.isStarted) {
+        if (isStarted) {
             throw new IllegalStateException("The client is started, you must stop it before changing the property");
         }
-        this.password = password;
+        password = password;
     }
     
     /**
@@ -159,19 +159,19 @@ public class HornetQRESTClient implements MessagingInterface {
      * @return the value of msgSubscriberId
      */
     public String getMsgSubscriberId() {
-        return this.msgSubscriberId;
+        return msgSubscriberId;
     }
     
     /**
      * Set the value of msgSubscriberId
      *
-     * @param serverURL new value of msgSubscriberId
+     * @param messagesSubscriberId new value of msgSubscriberId
      */
     public void setMsgSubscriberId(String messagesSubscriberId) throws IllegalStateException {
-        if (this.isStarted) {
+        if (isStarted) {
             throw new IllegalStateException("The client is started, you must stop it before changing the property");
         }
-        this.msgSubscriberId = messagesSubscriberId;
+        msgSubscriberId = messagesSubscriberId;
     }
 
     /**
@@ -186,29 +186,29 @@ public class HornetQRESTClient implements MessagingInterface {
         ClientExecutor clientExecutor = null;
 
         try {
-            if (this.isStarted) {
+            if (isStarted) {
                 throw new IllegalStateException("The client is already started");
             }
 
-            if (this.serverURL == null || this.queue == null) {
+            if (serverURL == null || queue == null) {
                 throw new IllegalStateException("You must assign the URL of the server and the queue");
             }
 
-            this.isTopic = this.queue.startsWith("jms.topic");
+            isTopic = queue.startsWith("jms.topic");
 
-            if (this.isTopic) {
-                if (this.msgSubscriberId == null) {
+            if (isTopic) {
+                if (msgSubscriberId == null) {
                     throw new MessagingException("You must assign the id of the subscriber for a topic");
                 }
             }
 
-            if ((this.user == null && this.password != null) || (this.user != null && this.password == null)) {
+            if ((user == null && password != null) || (user != null && password == null)) {
                 throw new MessagingException("You must assign both the user and the password for authentication");
-            } else if (this.user != null && this.password != null) {
+            } else if (user != null && password != null) {
                 Credentials credentials;
                 HttpClient httpClient;
 
-                credentials = new UsernamePasswordCredentials(this.user, this.password);
+                credentials = new UsernamePasswordCredentials(user, password);
                 httpClient = new HttpClient();
                 httpClient.getState().setCredentials(AuthScope.ANY, credentials);
                 httpClient.getParams().setAuthenticationPreemptive(true);
@@ -216,15 +216,15 @@ public class HornetQRESTClient implements MessagingInterface {
             }
 
             if (clientExecutor == null) {
-                request = new ClientRequest(this.serverURL + (this.isTopic ? "/topics/" : "/queues/") + this.queue);
+                request = new ClientRequest(serverURL + (isTopic ? "/topics/" : "/queues/") + queue);
             } else {
-                request = new ClientRequest(this.serverURL + (this.isTopic ? "/topics/" : "/queues/") + this.queue, clientExecutor);
+                request = new ClientRequest(serverURL + (isTopic ? "/topics/" : "/queues/") + queue, clientExecutor);
             }
 
             response = request.head();
             if (response.getResponseStatus().equals(Response.Status.OK)) {
-                this.msgCreateLink = response.getHeaderAsLink("msg-create");                
-                this.msgPullConsumerCreationLink = response.getHeaderAsLink(this.isTopic ? "msg-pull-subscriptions" : "msg-pull-consumers");
+                msgCreateLink = response.getHeaderAsLink("msg-create");                
+                msgPullConsumerCreationLink = response.getHeaderAsLink(isTopic ? "msg-pull-subscriptions" : "msg-pull-consumers");
             } else if (response.getResponseStatus().equals(Response.Status.NOT_FOUND)) {
                 throw new MessagingException("The queue " + queue + " is not registered");
             } else if (response.getResponseStatus().equals(Response.Status.UNAUTHORIZED)) {
@@ -233,7 +233,7 @@ public class HornetQRESTClient implements MessagingInterface {
                 throw new MessagingException("Response code  " + response.getStatus() + " not supported");
             }
 
-            this.isStarted = true;
+            isStarted = true;
         } catch (MessagingException ex) {
             throw ex;
         } catch (Exception ex) {
@@ -253,21 +253,21 @@ public class HornetQRESTClient implements MessagingInterface {
         ClientResponse response;
 
         try {
-            if (!this.isStarted) {
+            if (!isStarted) {
                 throw new IllegalStateException("The client is not started");
             }
 
-            response = this.msgCreateLink.request().body(MediaType.APPLICATION_XML, message).post();
+            response = msgCreateLink.request().body(MediaType.APPLICATION_XML, message).post();
 
             // Redirect received, try again
             if (response.getStatus() == 307) {
-                this.msgCreateLink = response.getLocation();
+                msgCreateLink = response.getLocation();
                 
-                response = this.msgCreateLink.request().body(MediaType.APPLICATION_XML, message).post();
+                response = msgCreateLink.request().body(MediaType.APPLICATION_XML, message).post();
             }
             
             if (response.getResponseStatus().equals(Response.Status.CREATED)) {
-                this.msgCreateLink = response.getHeaderAsLink("msg-create-next");
+                msgCreateLink = response.getHeaderAsLink("msg-create-next");
             } else {
                 throw new MessagingException("Response code  " + response.getStatus() + " not supported");
             }
@@ -292,48 +292,48 @@ public class HornetQRESTClient implements MessagingInterface {
         ClientResponse<T> response;
 
         try {
-            if (!this.isStarted) {
+            if (!isStarted) {
                 throw new IllegalStateException("The client is not started");
             }
 
-            if (this.msgAcknowledgementLink != null) {
+            if (msgAcknowledgementLink != null) {
                 throw new IllegalStateException("There is a message waiting for acknowledgement");
             }
 
             // Creates the consumer if needed
-            if (this.msgPullConsumerLink == null) {
-                if (this.isTopic) {
-                    response = this.msgPullConsumerCreationLink.request()
+            if (msgPullConsumerLink == null) {
+                if (isTopic) {
+                    response = msgPullConsumerCreationLink.request()
                             .formParameter("autoAck", "false")
                             .formParameter("durable", "true")
-                            .formParameter("name", this.msgSubscriberId)
+                            .formParameter("name", msgSubscriberId)
                             .post();
                 } else {
-                    response = this.msgPullConsumerCreationLink.request().formParameter("autoAck", "false").post();
+                    response = msgPullConsumerCreationLink.request().formParameter("autoAck", "false").post();
                 }
                 
                 if (response.getResponseStatus().equals(Response.Status.CREATED)) {
-                    this.msgPullConsumerLink = response.getLocation();                    
-                    this.nextMsgLink = response.getHeaderAsLink("msg-acknowledge-next");
+                    msgPullConsumerLink = response.getLocation();                    
+                    nextMsgLink = response.getHeaderAsLink("msg-acknowledge-next");
                 } else if (response.getResponseStatus().equals(Response.Status.NO_CONTENT)) {
-                    this.nextMsgLink = response.getHeaderAsLink("msg-acknowledge-next");              
+                    nextMsgLink = response.getHeaderAsLink("msg-acknowledge-next");              
                 } else {
                     throw new MessagingException("Response code  " + response.getStatus() + " not supported");
                 }
             }
 
-            response = this.nextMsgLink.request()
+            response = nextMsgLink.request()
                     .header("Accept-Wait", SECONDS_WAITING)
                     .header("Accept", MediaType.APPLICATION_XML)
                     .post();
 
             if (response.getResponseStatus().equals(Response.Status.OK)) {
                 message = (T) response.getEntity(type);
-                this.msgAcknowledgementLink = response.getHeaderAsLink("msg-acknowledgement");
+                msgAcknowledgementLink = response.getHeaderAsLink("msg-acknowledgement");
             } else if (response.getResponseStatus().equals(Response.Status.SERVICE_UNAVAILABLE)) {
-                this.nextMsgLink = response.getHeaderAsLink("msg-acknowledge-next");
+                nextMsgLink = response.getHeaderAsLink("msg-acknowledge-next");
             } else if (response.getResponseStatus().equals(Response.Status.PRECONDITION_FAILED)) {
-                this.nextMsgLink = response.getHeaderAsLink("msg-acknowledge-next");
+                nextMsgLink = response.getHeaderAsLink("msg-acknowledge-next");
             } else {
                 throw new MessagingException("Response code  " + response.getStatus() + " not supported");
             }
@@ -356,19 +356,19 @@ public class HornetQRESTClient implements MessagingInterface {
         ClientResponse response;
 
         try {
-            if (!this.isStarted) {
+            if (!isStarted) {
                 throw new IllegalStateException("The client is not started");
             }
 
-            if (this.msgAcknowledgementLink == null) {
+            if (msgAcknowledgementLink == null) {
                 throw new MessagingException("No messages waiting for acknowledgement");
             }
 
-            response = this.msgAcknowledgementLink.request().formParameter("acknowledge", "true").post();
+            response = msgAcknowledgementLink.request().formParameter("acknowledge", "true").post();
 
             if (response.getResponseStatus().equals(Response.Status.NO_CONTENT)) {
-                this.nextMsgLink = response.getHeaderAsLink("msg-acknowledge-next");                
-                this.msgAcknowledgementLink = null;
+                nextMsgLink = response.getHeaderAsLink("msg-acknowledge-next");                
+                msgAcknowledgementLink = null;
             } else {
                 throw new MessagingException("Response code  " + response.getStatus() + " not supported");
             }
@@ -389,20 +389,20 @@ public class HornetQRESTClient implements MessagingInterface {
         ClientResponse response;
 
         try {
-            if (!this.isStarted) {
+            if (!isStarted) {
                 throw new IllegalStateException("The client is not started");
             }
 
-            if (this.msgPullConsumerLink != null && (!this.isTopic)) {
-                response = this.msgPullConsumerLink.request().delete();
+            if (msgPullConsumerLink != null && (!isTopic)) {
+                response = msgPullConsumerLink.request().delete();
 
                 if (!response.getResponseStatus().equals(Response.Status.NO_CONTENT)) {
                     throw new MessagingException("Response code  " + response.getStatus() + " not supported");
                 }
             }
 
-            this.isStarted = false;
-            this.initLinks();
+            isStarted = false;
+            initLinks();
         } catch (MessagingException ex) {
             throw ex;
         } catch (Exception ex) {
@@ -414,10 +414,10 @@ public class HornetQRESTClient implements MessagingInterface {
      * Initialization of the the auxiliary links
      */
     private void initLinks() {
-        this.msgAcknowledgementLink = null;
-        this.msgPullConsumerLink = null;
-        this.msgPullConsumerCreationLink = null;
-        this.msgCreateLink = null;
-        this.nextMsgLink = null;
+        msgAcknowledgementLink = null;
+        msgPullConsumerLink = null;
+        msgPullConsumerCreationLink = null;
+        msgCreateLink = null;
+        nextMsgLink = null;
     }
 }
